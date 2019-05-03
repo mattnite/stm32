@@ -6,6 +6,20 @@
 //
 // This file holds the main application
 
+class Point {
+	int x;
+	int y;
+
+public:
+	Point(int a, int b) : x(a), y(b) {}
+
+	int& getX() {
+		return x;
+	}
+};
+
 int main() {
-	return 0;
+	volatile int i = 5;
+	Point point(1, 2);
+	i = point.getX();
 }
