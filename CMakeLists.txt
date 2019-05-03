@@ -34,6 +34,7 @@ set(CMAKE_EXE_LINKER_FLAGS "--specs=nano.specs")
 include_directories(
 	"${STM32_CUBE}/Drivers/CMSIS/Device/ST/STM32L0xx/Include"
 	"${STM32_CUBE}/Drivers/CMSIS/Include"
+	"${CMAKE_CURRENT_SOURCE_DIR}/include"
 )
 add_executable(stm32 
 	"${STM32_CUBE}/Drivers/CMSIS/Device/ST/STM32L0xx/Source/Templates/gcc/startup_stm32l073xx.s"

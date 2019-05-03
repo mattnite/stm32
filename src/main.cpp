@@ -6,20 +6,9 @@
 //
 // This file holds the main application
 
-class Point {
-	int x;
-	int y;
-
-public:
-	Point(int a, int b) : x(a), y(b) {}
-
-	int& getX() {
-		return x;
-	}
-};
+#include "gpio.hpp"
 
 int main() {
-	volatile int i = 5;
-	Point point(1, 2);
-	i = point.getX();
+	Gpio a(0x50000000);
+	a.mode().set<3>();
 }
