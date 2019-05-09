@@ -6,9 +6,7 @@
 //
 // This file holds the main application
 
-#include "gpio.hpp"
 
 int main() {
-	Gpio a(0x50000000);
-	a.mode().set<3>();
+	volatile int i = 3;
 }
