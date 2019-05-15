@@ -8,14 +8,15 @@
 
 #include "gpio.hpp"
 
-using GPIOA = Gpio<0x50000000>;
+using GpioA = Gpio<0x50000000>;
 
 int main() {
 	// enable gpio clock
-	memory(0x40021000 + 0x2C) |= 1;
+	*reinterpret_cast<std::uint32_t*>(0x40021000 + 0x2C) |= 1;
+
 	// set gpio mode and turn on led
-	GPIOA::mode() &= ~(1 << 11);
-	GPIOA::bsrr() |= 1 << 5;
+	GpioA::Mode::set<11>();
+	GpioA::Bsrr::set<5>();
 
 	// the usual infinite loop
 	while (true) {}

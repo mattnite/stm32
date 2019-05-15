@@ -1,28 +1,39 @@
-// Generic Register class
+﻿// Register class
 //
 // Author: Matthew Knight
 // File Name: register.hpp
-// Date: 2019-05-03
+// Date: 2019-05-14
 
-#pragma once
 
 #include <cstdint>
 
-template <typename T = std::uint32_t>
-class Register1 {
-	const uint32_t address;
+/** Register access class
+ *
+ * This class provides a zero overhead method for managing special function
+ * registers.
+ */
+template <auto address, typename T = std::uint32_t>
+struct Register {
 
-public:
-	Register(uint32_t address) : address(address) {}
+    volatile static void set(T val) {
+        *reinterpret_cast<T*>(address) |= 1 << val;
+    }
 
-	template <uint32_t Bit>
-	void set() {
-		*reinterpret_cast<uint32_t*>(address) |= 1 << Bit;
-		static_assert(Bit < Width);
-	}
+    volatile static void clear(T val) {
+        *reinterpret_cast<T*>(address) &= ~(1 << val);
+    }
 
-	void set(const uint32_t bit) {
-		if (bit <Width)
-			*reinterpret_cast<uint32_t*>(address) |= 1 << bit;
-	}
+    template <T ...bits>
+    volatile static void set() {
+        *reinterpret_cast<T*>(address) |= ((1 << bits) | ... );
+    }
+
+    template <T ...bits>
+    volatile static void clear() {
+        *reinterpret_cast<T*>(address) &= (~(1 << bits) & ... );
+    }
+
+    volatile static T& reg() {
+        return *reinterpret_cast<T*>(address);
+    }
 };
