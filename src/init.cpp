@@ -1,3 +1,3 @@
 extern "C" {
-	void _init(void) {}
+void _init(void) {}
 }
