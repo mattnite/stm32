@@ -6,18 +6,17 @@
 //
 // This file holds the main application
 
-#include "peripherals/gpio.hpp"
-#include "peripherals/rcc.hpp"
+#include "svd-alias/svd-alias.hpp"
 
-#include "bit-field.hpp"
+using STM32L0x3;
 
 int main() {
     // enable gpio clock
-    Rcc::GpioClkEn::set<0>();
+    RCC::IOPENR::IOPAEN::write(1);
 
     // set gpio mode and turn on led
-    GpioA::Mode::set<11>();
-    GpioA::Bsrr::set<5>();
+    GPIOA::MODER::MODE5::write(2);
+    GPIOA::BSRR::BS5::write(1);
 
     // the usual infinite loop
     while (true) {

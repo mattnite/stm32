@@ -1,4 +1,8 @@
+#include "svd-alias/svd-alias.hpp"
+
 #include "stm32l0xx.h"
+
+using namespace STM32L0x3;
 
 #if !defined(HSE_VALUE)
 #define HSE_VALUE                                                                 \
@@ -52,21 +56,18 @@ const uint8_t PLLMulTable[9] = {3U, 4U, 6U, 8U, 12U, 16U, 24U, 32U, 48U};
  */
 extern "C" {
 void SystemInit(void) {
-    /*!< Set MSION bit */
-    RCC->CR |= (uint32_t)0x00000100U;
+    RCC::CR::MSION::write(1);
 
     /*!< Reset SW[1:0], HPRE[3:0], PPRE1[2:0], PPRE2[2:0], MCOSEL[2:0] and
      * MCOPRE[2:0] bits */
-    RCC->CFGR &= (uint32_t)0x88FF400CU;
+    RCC::CFGR::reg() &= 0x88ff400c;
 
     /*!< Reset HSION, HSIDIVEN, HSEON, CSSON and PLLON bits */
-    RCC->CR &= (uint32_t)0xFEF6FFF6U;
+    RCC::CR::reg() &= 0xfef6fff6;
 
-    /*!< Reset HSI48ON  bit */
-    RCC->CRRCR &= (uint32_t)0xFFFFFFFEU;
+    RCC::CRRCR::HSI48ON::write(0);
 
-    /*!< Reset HSEBYP bit */
-    RCC->CR &= (uint32_t)0xFFFBFFFFU;
+    RCC::CR::HSEBYP::write(0);
 
     /*!< Reset PLLSRC, PLLMUL[3:0] and PLLDIV[1:0] bits */
     RCC->CFGR &= (uint32_t)0xFF02FFFFU;
@@ -76,19 +77,8 @@ void SystemInit(void) {
 
     /* Configure the Vector Table location add offset address
      * ------------------*/
-#ifdef VECT_TAB_SRAM
-    SCB->VTOR =
-        SRAM_BASE |
-        VECT_TAB_OFFSET; /* Vector Table Relocation in
-                                                                        Internal
-                            SRAM */
-#else
-    SCB->VTOR =
-        FLASH_BASE |
-        VECT_TAB_OFFSET; /* Vector Table Relocation in
-                                                                        Internal
-                            FLASH */
-#endif
+    SCB->VTOR = FLASH_BASE | VECT_TAB_OFFSET; /* Vector Table Relocation in
+                                                 Internal FLASH */
 }
 }
 
