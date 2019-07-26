@@ -1,44 +1,28 @@
 cmake_minimum_required(VERSION 3.0)
 project(stm32 LANGUAGES CXX ASM)
 
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE MinSizeRel)
+endif()
+
 find_package(svd-alias REQUIRED)
 
-set(STM32_CUBE "${CMAKE_CURRENT_SOURCE_DIR}/STM32CubeL0")
-file(GLOB SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
+include($ENV{SVD_MODULE_PATH}/st-micro/STM32L0x3.cmake)
 
-# cpu settings
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mcpu=${CPU}")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mfloat-abi=${FLOAT_ABI}")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mthumb")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m${ENDIAN}-endian")
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mcpu=${CPU}")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mfloat-abi=${FLOAT_ABI}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mcpu=${SVD_CPU}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mfloat-abi=${SVD_FLOAT_ABI}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mthumb")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m${ENDIAN}-endian")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m${SVD_ENDIAN}-endian")
 
-set(LINKER_SCRIPT
-	"${STM32_CUBE}/Projects/NUCLEO-L073RZ/Templates/SW4STM32/STM32L073RZ_NUCLEO/STM32L073RZTx_FLASH.ld")
+set(LINKER_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/STM32L073RZTx_FLASH.ld")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -flto -T ${LINKER_SCRIPT}")
 
-set(WARNING_FLAGS "${WARNING_FLAGS} -Wall")
-set(SHARED_FLAGS "${SHARED_FLAGS} -g -Os -flto -nostartfiles")
-set(SHARED_FLAGS "${SHARED_FLAGS} -MMD -MP")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SHARED_FLAGS} ${WARNING_FLAGS}")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${SHARED_FLAGS} ${WARNING_FLAGS}")
-
-set(CMAKE_EXE_LINKER_FLAGS 
-	"${CMAKE_EXE_LINKER_FLAGS} -flto -T ${LINKER_SCRIPT}")
-	
-include_directories(
-	"${CMAKE_CURRENT_SOURCE_DIR}/include"
-)
-
-add_executable(stm32 
-	"${STM32_CUBE}/Drivers/CMSIS/Device/ST/STM32L0xx/Source/Templates/gcc/startup_stm32l073xx.s"
-	${SOURCES}
-)
-
+add_executable(stm32
+    src/startup_stm32l073xx.s
+    src/init-system.cpp
+    src/main.cpp)
+   
+target_include_directories(stm32 PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_link_libraries(stm32 svd-alias::svd-alias)
 
 add_custom_command(
