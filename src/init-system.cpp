@@ -54,41 +54,23 @@ extern "C" {
 void SystemInit(void) {
     Mcu::RCC::CR::MSION::write(1);
 
-    /*!< Reset SW[1:0], HPRE[3:0], PPRE1[2:0], PPRE2[2:0], MCOSEL[2:0] and
-     * MCOPRE[2:0] bits */
-    //Mcu::RCC::CFGR::reg() &= 0x88ff400c;
-    Mcu::RCC::CFGR::SW::write(0);
-    Mcu::RCC::CFGR::HPRE::write(0);
-    Mcu::RCC::CFGR::PPRE1::write(0);
-    Mcu::RCC::CFGR::PPRE2::write(0);
-    Mcu::RCC::CFGR::MCOSEL::write(0);
+    // Reset SW[1:0], HPRE[3:0], PPRE1[2:0], PPRE2[2:0], MCOSEL[2:0], MCOPRE[2:0] bits
+    Mcu::RCC::CFGR::reg() &= 0x88ff400c;
 
-    /*!< Reset HSION, HSIDIVEN, HSEON, CSSON and PLLON bits */
-    //Mcu::RCC::CR::reg() &= 0xfef6fff6;
-    Mcu::RCC::CR::PLLON::write(0);
-    Mcu::RCC::CR::CSSLSEON::write(0);
-    Mcu::RCC::CR::HSEON::write(0);
-    Mcu::RCC::CR::HSI16DIVEN::write(0);
-    Mcu::RCC::CR::HSI16ON::write(0);
+    // Reset HSION, HSIDIVEN, HSEON, CSSON and PLLON bits
+    Mcu::RCC::CR::reg() &= 0xfef6fff6;
 
     Mcu::RCC::CRRCR::HSI48ON::write(0);
-
     Mcu::RCC::CR::HSEBYP::write(0);
 
-    /*!< Reset PLLSRC, PLLMUL[3:0] and PLLDIV[1:0] bits */
-    //RCC->CFGR &= (uint32_t)0xFF02FFFFU;
-    Mcu::RCC::CFGR::PLLSRC::write(0);
-    Mcu::RCC::CFGR::PLLMUL::write(0);
-    Mcu::RCC::CFGR::PLLDIV::write(0);
+    // Reset PLLSRC, PLLMUL[3:0] and PLLDIV[1:0] bits
+    Mcu::RCC::CFGR::reg() &= 0xff02ffff;
 
-    /*!< Disable all interrupts */
+    // Disable all interrupts
     Mcu::RCC::CIER::reg() = 0;
 
-    /* Configure the Vector Table location add offset address
-     * ------------------*/
+    // Configure the Vector Table location add offset address
     Mcu::SCB::VTOR::reg() = FLASH_BASE | VECT_TAB_OFFSET;
-    /* Vector Table Relocation in
-                                                 Internal FLASH */
 }
 }
 
