@@ -68,9 +68,6 @@ void SystemInit(void) {
 
     // Disable all interrupts
     Mcu::RCC::CIER::reg() = 0;
-
-    // Configure the Vector Table location add offset address
-    Mcu::SCB::VTOR::reg() = FLASH_BASE | VECT_TAB_OFFSET;
 }
 }
 

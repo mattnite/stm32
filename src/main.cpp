@@ -10,21 +10,20 @@
 
 #include <array>
 
-template <auto size, std::size_t alignment>
-struct InterruptVectorTableBase {
-    __attribute__((aligned(alignment)))
-    std::array<int, size> arr;
+template <auto size, std::size_t alignment> struct InterruptVectorTableBase {
+    __attribute__((aligned(alignment))) std::array<int, size> table;
 };
 
 template <typename Mcu>
-struct InterruptVectorTable : InterruptVectorTableBase<4, 2 << Mcu::SCB::VTOR::TBLOFF::offset> {
-
-};
+struct InterruptVectorTable
+    : public InterruptVectorTableBase<4, 2 << Mcu::SCB::VTOR::TBLOFF::offset> {};
 
 using Mcu = STM32L0x3;
 
 int main() {
-    volatile constexpr InterruptVectorTable<Mcu> ivt{0, 1, 2, 3};
+    //volatile constexpr InterruptVectorTable<Mcu> ivt{0, 1, 2, 3};
+    //Mcu::SCB::VTOR::reg() = reinterpret_cast<unsigned>(ivt.table.data());
+
     // enable gpio clock
     Mcu::RCC::IOPENR::IOPAEN::write(1);
 
