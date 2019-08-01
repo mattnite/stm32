@@ -23,8 +23,8 @@ template <auto size, std::size_t alignment> struct InterruptVectorTableBase {
 };
 
 template <typename Mcu>
-using InterruptVectorTable
-    = InterruptVectorTableBase<4, 1 << Mcu::SCB::VTOR::TBLOFF::offset>;
+using InterruptVectorTable = InterruptVectorTableBase<
+        Mcu::numInterrupts + 16, 1 << Mcu::SCB::VTOR::TBLOFF::offset>;
 
 int main() {
     volatile InterruptVectorTable<Mcu> ivt{foo, foo, foo, foo};
