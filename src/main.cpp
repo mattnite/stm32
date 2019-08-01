@@ -9,6 +9,9 @@
 #include "svd-alias/svd-alias.hpp"
 
 #include <array>
+#include <string>
+
+volatile static int list[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 
 template <auto size, std::size_t alignment> struct InterruptVectorTableBase {
     __attribute__((aligned(alignment))) std::array<int, size> table;
@@ -22,6 +25,7 @@ using Mcu = STM32L0x3;
 
 int main() {
     //volatile constexpr InterruptVectorTable<Mcu> ivt{0, 1, 2, 3};
+	//volatile int nums[] = { 1, 2, 4, 5 };
     //Mcu::SCB::VTOR::reg() = reinterpret_cast<unsigned>(ivt.table.data());
 
     // enable gpio clock

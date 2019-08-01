@@ -64,7 +64,8 @@ defined in linker script */
 Reset_Handler:  
    ldr   r0, =_estack
    mov   sp, r0          /* set stack pointer */
-
+/* Call the clock system intitialization function.*/
+  bl  SystemInit
 /* Copy the data segment initializers from flash to SRAM */
   movs  r1, #0
   b  LoopCopyDataInit
@@ -89,22 +90,27 @@ FillZerobss:
   str  r3, [r2]
   adds r2, r2, #4
 
-
 LoopFillZerobss:
   ldr  r3, = _ebss
   cmp  r2, r3
   bcc  FillZerobss
 
-/* Call the clock system intitialization function.*/
-  bl  SystemInit
 /* Call static constructors */
-    bl __libc_init_array
+//  bl __libc_init_array
 /* Call the application's entry point.*/
   bl  main
 
 LoopForever:
     b LoopForever
-
+/*
+_init:
+  push    {r3, r4, r5, r6, r7, lr}
+  nop                     // (mov r8, r8)
+  pop     {r3, r4, r5, r6, r7}
+  pop     {r3}
+  mov     lr, r3
+  bx      lr
+  */
 
 .size  Reset_Handler, .-Reset_Handler
 
@@ -137,7 +143,9 @@ g_pfnVectors:
   .word  _estack
   .word  Reset_Handler
   .word  NMI_Handler
+  
   .word  HardFault_Handler
+
   .word  0
   .word  0
   .word  0
