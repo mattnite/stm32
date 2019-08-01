@@ -9,12 +9,11 @@
 #include "svd-alias/svd-alias.hpp"
 
 #include <array>
+#include <tuple>
 
 using Mcu = STM32L0x3;
 
-void foo() {
-
-}
+void foo() {}
 
 using Isr = void (*)();
 
@@ -23,12 +22,33 @@ template <auto size, std::size_t alignment> struct InterruptVectorTableBase {
 };
 
 template <typename Mcu>
-using InterruptVectorTable = InterruptVectorTableBase<
-        Mcu::numInterrupts + 16, 1 << Mcu::SCB::VTOR::TBLOFF::offset>;
+using InterruptVectorTable =
+    InterruptVectorTableBase<Mcu::numInterrupts + 16,
+                             1 << Mcu::SCB::VTOR::TBLOFF::offset>;
+
+template <typename Mcu>
+struct ManagedInterruptVectorTable : public InterruptVectorTable<Mcu> {
+    using Base = InterruptVectorTable<Mcu>;
+
+    template <typename Pair>
+    constexpr void loadPair(Pair pair) {
+        Base::table[(int)pair.first] = pair.second;
+    }
+
+    template <typename ...Pairs>
+    constexpr ManagedInterruptVectorTable(Pairs&& ...pairs) {
+        (loadPair(pairs), ...);
+    }
+};
 
 int main() {
-    volatile InterruptVectorTable<Mcu> ivt{foo, foo, foo, foo};
+    //volatile InterruptVectorTable<Mcu> ivt{foo, foo, foo, foo};
+    volatile constexpr ManagedInterruptVectorTable<Mcu> test{
+        std::make_pair(Mcu::Interrupts::RCC, foo),
+        std::make_pair(Mcu::Interrupts::USB, foo)
+    };
 
+    /*
     Mcu::SCB::VTOR::write(reinterpret_cast<std::uint32_t>(ivt.table));
 
     // enable gpio clock
@@ -43,4 +63,5 @@ int main() {
     // the usual infinite loop
     while (true) {
     }
+    */
 }

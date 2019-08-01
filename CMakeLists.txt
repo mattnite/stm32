@@ -14,7 +14,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mfloat-abi=${SVD_FLOAT_ABI}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mthumb")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m${SVD_ENDIAN}-endian")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-exceptions -fno-rtti")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -nostartfiles")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -nostartfiles -nostdlib")
 
 set(LINKER_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/STM32L073RZTx_FLASH.ld")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -flto -T ${LINKER_SCRIPT}")
@@ -25,7 +25,7 @@ add_executable(stm32
     src/main.cpp)
    
 target_include_directories(stm32 PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")
-target_link_libraries(stm32 svd-alias::svd-alias)
+target_link_libraries(stm32 svd-alias::svd-alias gcc)
 
 add_custom_command(
 	TARGET stm32 POST_BUILD
