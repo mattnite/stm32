@@ -20,16 +20,6 @@
     ((uint32_t)16000000U) /*!< Value of the Internal \ oscillator \ in Hz*/
 #endif                    /* HSI_VALUE */
 
-/************************* Miscellaneous Configuration ************************/
-
-/*!< Uncomment the following line if you need to relocate your vector Table in
-     Internal SRAM. */
-/* #define VECT_TAB_SRAM */
-#define VECT_TAB_OFFSET                                                        \
-    0x00U /*!< Vector Table base offset field.                                 \
-              This value must be a multiple of 0x100. */
-/******************************************************************************/
-
 /* This variable is updated in three ways:
     1) by calling CMSIS function SystemCoreClockUpdate() 2) by calling HAL API
     function HAL_RCC_GetHCLKFreq() 3) each time HAL_RCC_ClockConfig() is called
@@ -38,17 +28,14 @@
     functions listed above, since SystemCoreClock variable is updated
     automatically.
 */
-uint32_t SystemCoreClock = 2097152U; /* 32.768 kHz * 2^6 */
+
+/*
+uint32_t SystemCoreClock = 2097152U; //32.768 kHz * 2^6
 const uint8_t AHBPrescTable[16] = {0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U,
                                    1U, 2U, 3U, 4U, 6U, 7U, 8U, 9U};
 const uint8_t APBPrescTable[8] = {0U, 0U, 0U, 0U, 1U, 2U, 3U, 4U};
 const uint8_t PLLMulTable[9] = {3U, 4U, 6U, 8U, 12U, 16U, 24U, 32U, 48U};
-
-/**
- * @brief  Setup the microcontroller system.
- * @param  None
- * @retval None
- */
+*/
 
 extern void (*_spreinit_array []) (void) __attribute__((weak));
 extern void (*_epreinit_array [])(void) __attribute__((weak));
@@ -58,7 +45,7 @@ extern void (*_einit_array [])(void) __attribute__((weak));
 using Mcu = STM32L0x3;
 
 extern "C" {
-void SystemInit(void) {
+void system_init() {
 	Mcu::RCC::CR::MSION::write(1);
 
     // Reset SW[1:0], HPRE[3:0], PPRE1[2:0], PPRE2[2:0], MCOSEL[2:0], MCOPRE[2:0] bits
@@ -74,8 +61,8 @@ void SystemInit(void) {
     Mcu::RCC::CFGR::reg() &= 0xff02ffff;
 
     // Disable all interrupts
-    Mcu::RCC::CIER::reg() = 0;
-	
+    //Mcu::RCC::CIER::write(0);
+
 	// Call C++ static initializers.
 	// ('preinit_array' functions are unlikely if the user
 	//  doesn't define any, I think. But check for them anyways.)
@@ -131,7 +118,7 @@ void SystemInit(void) {
  *         - The result of this function could be not correct when using
  *         fractional value for HSE crystal.  @param  None @retval None
  */
-void SystemCoreClockUpdate(void) {
+//void SystemCoreClockUpdate(void) {
     /*
     uint32_t tmp = 0U, pllmul = 0U, plldiv = 0U, pllsource = 0U, msirange = 0U;
 
@@ -185,4 +172,4 @@ void SystemCoreClockUpdate(void) {
     /* HCLK clock frequency */
    // SystemCoreClock >>= tmp;
 
-}
+//}
