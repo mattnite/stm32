@@ -22,9 +22,15 @@ template <auto size, std::size_t alignment> struct InterruptVectorTableBase {
     __attribute__((aligned(alignment))) volatile Isr table[size];
 };
 
+template <typename Mcu> struct IrqOffset;
+
+template <> struct IrqOffset<STM32L0x3> {
+    const static std::uint32_t value = 16;
+};
+
 template <typename Mcu>
 using InterruptVectorTable =
-    InterruptVectorTableBase<Mcu::numInterrupts + 16,
+    InterruptVectorTableBase<Mcu::numInterrupts + IrqOffset<Mcu>::value,
                              1 << Mcu::SCB::VTOR::TBLOFF::offset>;
 
 template <typename Mcu>
@@ -33,7 +39,8 @@ struct ManagedInterruptVectorTable : public InterruptVectorTable<Mcu> {
     std::uint32_t const vtor;
 
     template <typename Pair> void loadPair(Pair pair) {
-        Base::table[static_cast<std::uint32_t>(pair.first)] = pair.second;
+        Base::table[static_cast<std::uint32_t>(pair.first) +
+                    IrqOffset<Mcu>::value] = pair.second;
     }
 
     template <typename... Pairs>
@@ -50,8 +57,8 @@ int main() {
     {
         Pulse<Mcu::GPIOA, 6> ivtPulse;
         const ManagedInterruptVectorTable<Mcu> ivt{
-            std::make_pair(0, foo),
-            std::make_pair(1,
+            std::make_pair(Mcu::Interrupts::USB, foo),
+            std::make_pair(Mcu::Interrupts::RCC,
                            []() {
                                Mcu::GPIOA::BSRR::BS5::write(1);
                                Mcu::GPIOA::BSRR::BS5::write(0);
