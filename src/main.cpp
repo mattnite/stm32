@@ -54,7 +54,6 @@ struct ManagedInterruptVectorTable : public InterruptVectorTable<Mcu> {
 };
 
 int main() {
-    {
         Pulse<Mcu::GPIOA, 6> ivtPulse;
         const ManagedInterruptVectorTable<Mcu> ivt{
             std::make_pair(Mcu::Interrupts::USB, foo),
@@ -70,9 +69,16 @@ int main() {
                 *reinterpret_cast<volatile std::uint32_t *>(0x50000018) &=
                     ~(1 << 5);
             })};
-    }
+
+    Mcu::RCC::IOPENR::IOPAEN::write(1);
+
+    Mcu::GPIOA::MODER::MODE5::write(1);
 
     // the usual infinite loop
     while (true) {
+        for (auto i = 0; i < 100000; i++)
+            ;
+
+        Mcu::GPIOA::ODR::toggle(5);
     }
 }
