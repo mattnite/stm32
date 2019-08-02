@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.0)
 project(stm32 LANGUAGES CXX ASM)
 
 if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE MinSizeRel)
+	set(CMAKE_BUILD_TYPE MinSizeRel)
 endif()
 
 find_package(svd-alias REQUIRED)

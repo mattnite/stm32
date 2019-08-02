@@ -6,19 +6,20 @@
 //
 // This file holds the main application
 
+#include "constants.hpp"
+#include "gpio.hpp"
+
 #include "svd-alias/svd-alias.hpp"
 
 #include <array>
 #include <tuple>
-
-using Mcu = STM32L0x3;
 
 void foo() {}
 
 using Isr = void (*)();
 
 template <auto size, std::size_t alignment> struct InterruptVectorTableBase {
-    __attribute__((aligned(alignment))) Isr table[size];
+    __attribute__((aligned(alignment))) volatile Isr table[size];
 };
 
 template <typename Mcu>
@@ -29,39 +30,42 @@ using InterruptVectorTable =
 template <typename Mcu>
 struct ManagedInterruptVectorTable : public InterruptVectorTable<Mcu> {
     using Base = InterruptVectorTable<Mcu>;
+    std::uint32_t const vtor;
 
-    template <typename Pair>
-    constexpr void loadPair(Pair pair) {
-        Base::table[(int)pair.first] = pair.second;
+    template <typename Pair> void loadPair(Pair pair) {
+        Base::table[static_cast<std::uint32_t>(pair.first)] = pair.second;
     }
 
-    template <typename ...Pairs>
-    constexpr ManagedInterruptVectorTable(Pairs&& ...pairs) {
+    template <typename... Pairs>
+    ManagedInterruptVectorTable(Pairs &&... pairs)
+        : vtor(Mcu::SCB::VTOR::read()) {
         (loadPair(pairs), ...);
+        Mcu::SCB::VTOR::write(reinterpret_cast<std::uint32_t>(Base::table));
     }
+
+    ~ManagedInterruptVectorTable() { Mcu::SCB::VTOR::write(vtor); }
 };
 
 int main() {
-    //volatile InterruptVectorTable<Mcu> ivt{foo, foo, foo, foo};
-    volatile constexpr ManagedInterruptVectorTable<Mcu> test{
-        std::make_pair(Mcu::Interrupts::RCC, foo),
-        std::make_pair(Mcu::Interrupts::USB, foo)
-    };
-
-    /*
-    Mcu::SCB::VTOR::write(reinterpret_cast<std::uint32_t>(ivt.table));
-
-    // enable gpio clock
-    Mcu::RCC::IOPENR::IOPAEN::write(1);
-
-    // set gpio mode and turn on led
-    Mcu::GPIOA::MODER::MODE5::write(2);
-    Mcu::GPIOA::BSRR::BS5::write(1);
-
-    Mcu::RCC::IOPENR::IOPAEN::write(0);
+    {
+        Pulse<Mcu::GPIOA, 6> ivtPulse;
+        const ManagedInterruptVectorTable<Mcu> ivt{
+            std::make_pair(0, foo),
+            std::make_pair(1,
+                           []() {
+                               Mcu::GPIOA::BSRR::BS5::write(1);
+                               Mcu::GPIOA::BSRR::BS5::write(0);
+                           }),
+            std::make_pair(2, []() { Pulse<Mcu::GPIOA, 5> pulse; }),
+            std::make_pair(3, []() {
+                *reinterpret_cast<volatile std::uint32_t *>(0x50000018) |= 1
+                                                                           << 5;
+                *reinterpret_cast<volatile std::uint32_t *>(0x50000018) &=
+                    ~(1 << 5);
+            })};
+    }
 
     // the usual infinite loop
     while (true) {
     }
-    */
 }

@@ -46,17 +46,19 @@
 //.global  interrupt_vector
 .global  default_handler
 
-/* start address for the initialization values of the .data section.
-defined in linker script */
+/*
+// start address for the initialization values of the .data section.
+//defined in linker script
 .word  _sidata
-/* start address for the .data section. defined in linker script */
+// start address for the .data section. defined in linker script
 .word  _sdata
-/* end address for the .data section. defined in linker script */
+// end address for the .data section. defined in linker script
 .word  _edata
-/* start address for the .bss section. defined in linker script */
+// start address for the .bss section. defined in linker script
 .word  _sbss
-/* end address for the .bss section. defined in linker script */
+// end address for the .bss section. defined in linker script
 .word  _ebss
+*/
 
 .section  .text.reset_handler
   .weak  reset_handler
