@@ -31,6 +31,7 @@ void setPc(unsigned pc) {
 int main() {
     Svd::SysTick<Mcu> tick(Svd::Milliseconds(1));
 	const InterruptVectorTable<Mcu> ivt{
+        foo,
 		std::make_pair(Mcu::Interrupts::USB, foo),
 		std::make_pair(Mcu::Interrupts::RCC,
 					   []() {

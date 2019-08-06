@@ -22,6 +22,9 @@ using InterruptVectorTableCortexM =
                              1 << Mcu::SCB::VTOR::TBLOFF::offset>;
 
 template <typename Mcu>
+struct SystemExceptions;
+
+template <typename Mcu>
 struct InterruptVectorTable : public InterruptVectorTableCortexM<Mcu> {
     using Base = InterruptVectorTableCortexM<Mcu>;
     std::uint32_t const vtor;
@@ -31,10 +34,15 @@ struct InterruptVectorTable : public InterruptVectorTableCortexM<Mcu> {
     }
 
     template <typename... Pairs>
-    InterruptVectorTable(Pairs &&... pairs)
+    InterruptVectorTable(Isr const& sysTick, Pairs &&... pairs)
         : vtor(Mcu::SCB::VTOR::read()) {
+        Base::table[15] = sysTick;
         (loadPair(pairs), ...);
         Mcu::SCB::VTOR::write(reinterpret_cast<std::uint32_t>(Base::table));
+    }
+
+    void setSysTick(Isr const& isr) {
+        Base::table[15] = isr;
     }
 
     ~InterruptVectorTable() { Mcu::SCB::VTOR::write(vtor); }
