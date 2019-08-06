@@ -6,15 +6,14 @@
 
 #pragma once
 
-#include "svd-alias/svd-alias.hpp"
+#include <type_traits>
 
-template <typename Peripheral>
+template <typename Peripheral,
+          typename = std::enable_if_t<
+              std::is_same_v<Peripheral, typename Peripheral::Mcu::TIM6> ||
+              std::is_same_v<Peripheral, typename Peripheral::Mcu::TIM7>>>
 struct BasicTimer {
-	BasicTimer() {
-		Peripheral::CR1::CEN::write(1);
-	}
+    BasicTimer() { Peripheral::CR1::CEN::write(1); }
 
-	~BasicTimer() {
-		Peripheral::CR1::CEN::write(0);
-	}
+    ~BasicTimer() { Peripheral::CR1::CEN::write(0); }
 };

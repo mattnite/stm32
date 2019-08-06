@@ -6,18 +6,30 @@
 //
 // This file holds the main application
 
+#include "basic-timer.hpp"
 #include "constants.hpp"
 #include "gpio.hpp"
 #include "interrupt-table.hpp"
 
-#include "svd-alias/svd-alias.hpp"
+#include "svd-alias/sys-tick.hpp"
 
 #include <array>
 #include <tuple>
 
 void foo() {}
 
+unsigned getPc() {
+    unsigned pc;
+    asm("mov %0, pc" : "=r"(pc));
+    return pc;
+}
+
+void setPc(unsigned pc) {
+    asm("mov pc, %0" : "=r"(pc));
+}
+
 int main() {
+    Svd::SysTick<Mcu> tick(Svd::Milliseconds(1));
 	const InterruptVectorTable<Mcu> ivt{
 		std::make_pair(Mcu::Interrupts::USB, foo),
 		std::make_pair(Mcu::Interrupts::RCC,
