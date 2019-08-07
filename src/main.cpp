@@ -11,32 +11,17 @@
 #include "gpio.hpp"
 #include "interrupt-table.hpp"
 
-//#include "svd-alias/sys-tick.hpp"
+#include "svd-alias/sys-tick.hpp"
 
 #include <array>
 #include <tuple>
 
 void foo() {}
 
-unsigned getPc() {
-    unsigned pc;
-    asm("mov %0, pc" : "=r"(pc));
-    return pc;
-}
-
-void setPc(unsigned pc) {
-    asm("mov pc, %0" : "=r"(pc));
-}
-
 int main() {
-//    Svd::SysTick<Mcu> tick(Svd::Milliseconds(1));
-	Mcu::GPIOA::ODR::write<
-		Svd::FieldPair<Mcu::GPIOA::ODR::OD3, 1>,
-		Svd::FieldPair<Mcu::GPIOA::ODR::OD5, 1>
-	//	Svd::FieldPair<Mcu::GPIOA::MODER::MODE5, 1>
-	>();
-	/*
-	const InterruptVectorTable<Mcu> ivt{
+    Svd::SysTick<Mcu> tick(Svd::Milliseconds(1));
+
+    const InterruptVectorTable<Mcu> ivt{
         foo,
 		std::make_pair(Mcu::Interrupts::USB, foo),
 		std::make_pair(Mcu::Interrupts::RCC,
@@ -55,5 +40,4 @@ int main() {
 
 		pin.toggle();
     }
-	*/
 }
