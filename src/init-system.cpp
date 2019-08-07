@@ -45,6 +45,22 @@ extern void (*_einit_array[])(void) __attribute__((weak));
 using Mcu = STM32L0x3;
 
 extern "C" {
+inline void static_initializers() {
+    // Call C++ static initializers.
+    // ('preinit_array' functions are unlikely if the user
+    //  doesn't define any, I think. But check for them anyways.)
+    int cpp_count = 0;
+    int cpp_size = &(_epreinit_array[0]) - &(_spreinit_array[0]);
+    for (cpp_count = 0; cpp_count < cpp_size; ++cpp_count) {
+        _spreinit_array[cpp_count]();
+    }
+    // ('init_array' sections call static constructors)
+    cpp_size = &(_einit_array[0]) - &(_sinit_array[0]);
+    for (cpp_count = 0; cpp_count < cpp_size; ++cpp_count) {
+        _sinit_array[cpp_count]();
+    }
+}
+
 void system_init() {
     Mcu::RCC::CR::MSION::write(1);
 
@@ -75,19 +91,7 @@ void system_init() {
                           Svd::ClearField<Mcu::RCC::CFGR::PLLMUL>,
                           Svd::ClearField<Mcu::RCC::CFGR::PLLDIV>>();
 
-    // Call C++ static initializers.
-    // ('preinit_array' functions are unlikely if the user
-    //  doesn't define any, I think. But check for them anyways.)
-    int cpp_count = 0;
-    int cpp_size = &(_epreinit_array[0]) - &(_spreinit_array[0]);
-    for (cpp_count = 0; cpp_count < cpp_size; ++cpp_count) {
-        _spreinit_array[cpp_count]();
-    }
-    // ('init_array' sections call static constructors)
-    cpp_size = &(_einit_array[0]) - &(_sinit_array[0]);
-    for (cpp_count = 0; cpp_count < cpp_size; ++cpp_count) {
-        _sinit_array[cpp_count]();
-    }
+    static_initializers();
 }
 }
 

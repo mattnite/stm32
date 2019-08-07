@@ -10,7 +10,7 @@
 
 using Isr = void (*)();
 
-std::uint32_t const irqOffset = 16;
+std::int32_t const irqOffset = 16;
 
 template <auto size, std::size_t alignment> struct InterruptVectorTableBase {
     __attribute__((aligned(alignment))) volatile Isr table[size];
@@ -29,19 +29,16 @@ struct InterruptVectorTable : public InterruptVectorTableCortexM<Mcu> {
     std::uint32_t const vtor;
 
     template <typename Pair> void loadPair(Pair pair) {
-        Base::table[static_cast<std::uint32_t>(pair.first) + irqOffset] =
+        Base::table[static_cast<std::int32_t>(pair.first) + irqOffset] =
             pair.second;
     }
 
     template <typename... Pairs>
-    InterruptVectorTable(Isr const &sysTick, Pairs &&... pairs)
-        : vtor(Mcu::SCB::VTOR::read()) {
-        Base::table[15] = sysTick;
+    InterruptVectorTable(Pairs &&... pairs) : vtor(Mcu::SCB::VTOR::read()) {
+        // TODO: copy end of stack pointer, reset_handler, nmi_handler
         (loadPair(pairs), ...);
         Mcu::SCB::VTOR::write(reinterpret_cast<std::uint32_t>(Base::table));
     }
-
-    void setSysTick(Isr const &isr) { Base::table[15] = isr; }
 
     ~InterruptVectorTable() { Mcu::SCB::VTOR::write(vtor); }
 };

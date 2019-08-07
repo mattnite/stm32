@@ -20,7 +20,6 @@ void foo() {}
 
 int main() {
     const InterruptVectorTable<Mcu> ivt{
-        foo,
 		std::make_pair(Mcu::Interrupts::USB, foo),
 		std::make_pair(Mcu::Interrupts::RCC,
 					   []() {
