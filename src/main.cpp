@@ -19,8 +19,6 @@
 void foo() {}
 
 int main() {
-    Svd::SysTick<Mcu> tick(Svd::Milliseconds(1));
-
     const InterruptVectorTable<Mcu> ivt{
         foo,
 		std::make_pair(Mcu::Interrupts::USB, foo),

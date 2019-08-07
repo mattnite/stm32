@@ -51,29 +51,29 @@ void system_init() {
     // Reset SW[1:0], HPRE[3:0], PPRE1[2:0], PPRE2[2:0], MCOSEL[2:0],
     // MCOPRE[2:0] bits
     // Mcu::RCC::CFGR::reg() &= 0x88ff400c;
-    Mcu::RCC::CFGR::write<Svd::FieldClear<Mcu::RCC::CFGR::SW>,
-                          Svd::FieldClear<Mcu::RCC::CFGR::HPRE>,
-                          Svd::FieldClear<Mcu::RCC::CFGR::PPRE1>,
-                          Svd::FieldClear<Mcu::RCC::CFGR::PPRE2>,
-                          Svd::FieldClear<Mcu::RCC::CFGR::MCOSEL>,
-                          Svd::FieldClear<Mcu::RCC::CFGR::MCOPRE>>();
+    Mcu::RCC::CFGR::write<Svd::ClearField<Mcu::RCC::CFGR::SW>,
+                          Svd::ClearField<Mcu::RCC::CFGR::HPRE>,
+                          Svd::ClearField<Mcu::RCC::CFGR::PPRE1>,
+                          Svd::ClearField<Mcu::RCC::CFGR::PPRE2>,
+                          Svd::ClearField<Mcu::RCC::CFGR::MCOSEL>,
+                          Svd::ClearField<Mcu::RCC::CFGR::MCOPRE>>();
 
     // Reset HSION, HSIDIVEN, HSEON, CSSON and PLLON bits
     // Mcu::RCC::CR::reg() &= 0xfef6fff6;
-    Mcu::RCC::CR::write<Svd::FieldClear<Mcu::RCC::CR::HSI16ON>,
-                        Svd::FieldClear<Mcu::RCC::CR::HSI16DIVEN>,
-                        Svd::FieldClear<Mcu::RCC::CR::HSEON>,
-                        Svd::FieldClear<Mcu::RCC::CR::CSSLSEON>,
-                        Svd::FieldClear<Mcu::RCC::CR::PLLON>>();
+    Mcu::RCC::CR::write<Svd::ClearField<Mcu::RCC::CR::HSI16ON>,
+                        Svd::ClearField<Mcu::RCC::CR::HSI16DIVEN>,
+                        Svd::ClearField<Mcu::RCC::CR::HSEON>,
+                        Svd::ClearField<Mcu::RCC::CR::CSSLSEON>,
+                        Svd::ClearField<Mcu::RCC::CR::PLLON>>();
 
     Mcu::RCC::CRRCR::HSI48ON::write(0);
     Mcu::RCC::CR::HSEBYP::write(0);
 
     // Reset PLLSRC, PLLMUL[3:0] and PLLDIV[1:0] bits
     // Mcu::RCC::CFGR::reg() &= 0xff02ffff;
-    Mcu::RCC::CFGR::write<Svd::FieldClear<Mcu::RCC::CFGR::PLLSRC>,
-                          Svd::FieldClear<Mcu::RCC::CFGR::PLLMUL>,
-                          Svd::FieldClear<Mcu::RCC::CFGR::PLLDIV>>();
+    Mcu::RCC::CFGR::write<Svd::ClearField<Mcu::RCC::CFGR::PLLSRC>,
+                          Svd::ClearField<Mcu::RCC::CFGR::PLLMUL>,
+                          Svd::ClearField<Mcu::RCC::CFGR::PLLDIV>>();
 
     // Call C++ static initializers.
     // ('preinit_array' functions are unlikely if the user
