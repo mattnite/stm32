@@ -43,22 +43,7 @@
 .fpu softvfp
 .thumb
 
-//.global  interrupt_vector
 .global  default_handler
-
-/*
-// start address for the initialization values of the .data section.
-//defined in linker script
-.word  _sidata
-// start address for the .data section. defined in linker script
-.word  _sdata
-// end address for the .data section. defined in linker script
-.word  _edata
-// start address for the .bss section. defined in linker script
-.word  _sbss
-// end address for the .bss section. defined in linker script
-.word  _ebss
-*/
 
 .section  .text.reset_handler
   .weak  reset_handler
@@ -122,54 +107,7 @@ interrupt_vector:
   .word  _estack
   .word  reset_handler
   .word  nmi_handler
-/*  
-  .word  HardFault_Handler
 
-  .word  0
-  .word  0
-  .word  0
-  .word  0
-  .word  0
-  .word  0
-  .word  0
-  .word  SVC_Handler
-  .word  0
-  .word  0
-  .word  PendSV_Handler
-  .word  SysTick_Handler
-  .word     WWDG_IRQHandler                   
-  .word     PVD_IRQHandler                    
-  .word     RTC_IRQHandler                    
-  .word     FLASH_IRQHandler                  
-  .word     RCC_CRS_IRQHandler                
-  .word     EXTI0_1_IRQHandler                
-  .word     EXTI2_3_IRQHandler                
-  .word     EXTI4_15_IRQHandler               
-  .word     TSC_IRQHandler                    
-  .word     DMA1_Channel1_IRQHandler          
-  .word     DMA1_Channel2_3_IRQHandler        
-  .word     DMA1_Channel4_5_6_7_IRQHandler  
-  .word     ADC1_COMP_IRQHandler              
-  .word     LPTIM1_IRQHandler                 
-  .word     USART4_5_IRQHandler               
-  .word     TIM2_IRQHandler                   
-  .word     TIM3_IRQHandler                   
-  .word     TIM6_DAC_IRQHandler               
-  .word     TIM7_IRQHandler 				      
-  .word     0              					     
-  .word     TIM21_IRQHandler                  
-  .word     I2C3_IRQHandler                   
-  .word     TIM22_IRQHandler                  
-  .word     I2C1_IRQHandler                   
-  .word     I2C2_IRQHandler                   
-  .word     SPI1_IRQHandler                   
-  .word     SPI2_IRQHandler                   
-  .word     USART1_IRQHandler                 
-  .word     USART2_IRQHandler                 
-  .word     RNG_LPUART1_IRQHandler            
-  .word     LCD_IRQHandler                    
-  .word     USB_IRQHandler                    
-*/
 /*******************************************************************************
 *
 * Provide weak aliases for each Exception handler to the default_handler.
@@ -179,113 +117,3 @@ interrupt_vector:
 *******************************************************************************/
    .weak      nmi_handler
    .thumb_set nmi_handler,default_handler
-/*
-   .weak      HardFault_Handler
-   .thumb_set HardFault_Handler,default_handler
-
-   .weak      SVC_Handler
-   .thumb_set SVC_Handler,default_handler
-
-   .weak      PendSV_Handler
-   .thumb_set PendSV_Handler,default_handler
-
-   .weak      SysTick_Handler
-   .thumb_set SysTick_Handler,default_handler
-
-   .weak      WWDG_IRQHandler
-   .thumb_set WWDG_IRQHandler,default_handler
-
-   .weak      PVD_IRQHandler
-   .thumb_set PVD_IRQHandler,default_handler
-
-   .weak      RTC_IRQHandler
-   .thumb_set RTC_IRQHandler,default_handler
-
-   .weak      FLASH_IRQHandler
-   .thumb_set FLASH_IRQHandler,default_handler
-
-   .weak      RCC_CRS_IRQHandler
-   .thumb_set RCC_CRS_IRQHandler,default_handler
-
-   .weak      EXTI0_1_IRQHandler
-   .thumb_set EXTI0_1_IRQHandler,default_handler
-
-   .weak      EXTI2_3_IRQHandler
-   .thumb_set EXTI2_3_IRQHandler,default_handler
-
-   .weak      EXTI4_15_IRQHandler
-   .thumb_set EXTI4_15_IRQHandler,default_handler
-
-   .weak      TSC_IRQHandler
-   .thumb_set TSC_IRQHandler,default_handler
-
-   .weak      DMA1_Channel1_IRQHandler
-   .thumb_set DMA1_Channel1_IRQHandler,default_handler
-
-   .weak      DMA1_Channel2_3_IRQHandler
-   .thumb_set DMA1_Channel2_3_IRQHandler,default_handler
-
-   .weak      DMA1_Channel4_5_6_7_IRQHandler
-   .thumb_set DMA1_Channel4_5_6_7_IRQHandler,default_handler
-
-   .weak      ADC1_COMP_IRQHandler
-   .thumb_set ADC1_COMP_IRQHandler,default_handler
-
-   .weak      LPTIM1_IRQHandler
-   .thumb_set LPTIM1_IRQHandler,default_handler
-
-   .weak      USART4_5_IRQHandler
-   .thumb_set USART4_5_IRQHandler,default_handler
-
-   .weak      TIM2_IRQHandler
-   .thumb_set TIM2_IRQHandler,default_handler
-
-   .weak      TIM3_IRQHandler
-   .thumb_set TIM3_IRQHandler,default_handler
-
-   .weak      TIM6_DAC_IRQHandler
-   .thumb_set TIM6_DAC_IRQHandler,default_handler
-
-   .weak      TIM7_IRQHandler
-   .thumb_set TIM7_IRQHandler,default_handler
-
-   .weak      TIM21_IRQHandler
-   .thumb_set TIM21_IRQHandler,default_handler
-
-   .weak      I2C3_IRQHandler
-   .thumb_set I2C3_IRQHandler,default_handler
-
-   .weak      TIM22_IRQHandler
-   .thumb_set TIM22_IRQHandler,default_handler
-
-   .weak      I2C1_IRQHandler
-   .thumb_set I2C1_IRQHandler,default_handler
-
-   .weak      I2C2_IRQHandler
-   .thumb_set I2C2_IRQHandler,default_handler
-
-   .weak      SPI1_IRQHandler
-   .thumb_set SPI1_IRQHandler,default_handler
-
-   .weak      SPI2_IRQHandler
-   .thumb_set SPI2_IRQHandler,default_handler
-
-   .weak      USART1_IRQHandler
-   .thumb_set USART1_IRQHandler,default_handler
-
-   .weak      USART2_IRQHandler
-   .thumb_set USART2_IRQHandler,default_handler
-
-   .weak      RNG_LPUART1_IRQHandler
-   .thumb_set RNG_LPUART1_IRQHandler,default_handler
-
-   .weak      LCD_IRQHandler
-   .thumb_set LCD_IRQHandler,default_handler
-
-   .weak      USB_IRQHandler
-   .thumb_set USB_IRQHandler,default_handler
-*/
-
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
-

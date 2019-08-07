@@ -1,8 +1,8 @@
 //#include "stm32l0xx.h"
 #include "constants.hpp"
 
-#include <cstdint>
 #include <algorithm>
+#include <cstdint>
 
 #define FLASH_BASE (0x08000000UL)
 #if !defined(HSE_VALUE)
@@ -37,65 +37,57 @@ const uint8_t APBPrescTable[8] = {0U, 0U, 0U, 0U, 1U, 2U, 3U, 4U};
 const uint8_t PLLMulTable[9] = {3U, 4U, 6U, 8U, 12U, 16U, 24U, 32U, 48U};
 */
 
-extern void (*_spreinit_array []) (void) __attribute__((weak));
-extern void (*_epreinit_array [])(void) __attribute__((weak));
-extern void (*_sinit_array [])(void) __attribute__((weak));
-extern void (*_einit_array [])(void) __attribute__((weak));
+extern void (*_spreinit_array[])(void) __attribute__((weak));
+extern void (*_epreinit_array[])(void) __attribute__((weak));
+extern void (*_sinit_array[])(void) __attribute__((weak));
+extern void (*_einit_array[])(void) __attribute__((weak));
 
 using Mcu = STM32L0x3;
 
 extern "C" {
 void system_init() {
-	Mcu::RCC::CR::MSION::write(1);
+    Mcu::RCC::CR::MSION::write(1);
 
-    // Reset SW[1:0], HPRE[3:0], PPRE1[2:0], PPRE2[2:0], MCOSEL[2:0], MCOPRE[2:0] bits
-    //Mcu::RCC::CFGR::reg() &= 0x88ff400c;
-	Mcu::RCC::CFGR::write<
-		Svd::FieldClear<Mcu::RCC::CFGR::SW>,
-		Svd::FieldClear<Mcu::RCC::CFGR::HPRE>,
-		Svd::FieldClear<Mcu::RCC::CFGR::PPRE1>,
-		Svd::FieldClear<Mcu::RCC::CFGR::PPRE2>,
-		Svd::FieldClear<Mcu::RCC::CFGR::MCOSEL>,
-		Svd::FieldClear<Mcu::RCC::CFGR::MCOPRE>	
-	>();
+    // Reset SW[1:0], HPRE[3:0], PPRE1[2:0], PPRE2[2:0], MCOSEL[2:0],
+    // MCOPRE[2:0] bits
+    // Mcu::RCC::CFGR::reg() &= 0x88ff400c;
+    Mcu::RCC::CFGR::write<Svd::FieldClear<Mcu::RCC::CFGR::SW>,
+                          Svd::FieldClear<Mcu::RCC::CFGR::HPRE>,
+                          Svd::FieldClear<Mcu::RCC::CFGR::PPRE1>,
+                          Svd::FieldClear<Mcu::RCC::CFGR::PPRE2>,
+                          Svd::FieldClear<Mcu::RCC::CFGR::MCOSEL>,
+                          Svd::FieldClear<Mcu::RCC::CFGR::MCOPRE>>();
 
     // Reset HSION, HSIDIVEN, HSEON, CSSON and PLLON bits
-    //Mcu::RCC::CR::reg() &= 0xfef6fff6;
-	Mcu::RCC::CR::write<
-		Svd::FieldClear<Mcu::RCC::CR::HSI16ON>,
-		Svd::FieldClear<Mcu::RCC::CR::HSI16DIVEN>,
-		Svd::FieldClear<Mcu::RCC::CR::HSEON>,
-//		Svd::FieldClear<Mcu::RCC::CR::CSSON>,
-		Svd::FieldClear<Mcu::RCC::CR::PLLON>
-	>();
+    // Mcu::RCC::CR::reg() &= 0xfef6fff6;
+    Mcu::RCC::CR::write<Svd::FieldClear<Mcu::RCC::CR::HSI16ON>,
+                        Svd::FieldClear<Mcu::RCC::CR::HSI16DIVEN>,
+                        Svd::FieldClear<Mcu::RCC::CR::HSEON>,
+                        Svd::FieldClear<Mcu::RCC::CR::CSSLSEON>,
+                        Svd::FieldClear<Mcu::RCC::CR::PLLON>>();
 
     Mcu::RCC::CRRCR::HSI48ON::write(0);
     Mcu::RCC::CR::HSEBYP::write(0);
 
     // Reset PLLSRC, PLLMUL[3:0] and PLLDIV[1:0] bits
-    //Mcu::RCC::CFGR::reg() &= 0xff02ffff;
-	Mcu::RCC::CFGR::write<
-		Svd::FieldClear<Mcu::RCC::CFGR::PLLSRC>,
-		Svd::FieldClear<Mcu::RCC::CFGR::PLLMUL>,
-		Svd::FieldClear<Mcu::RCC::CFGR::PLLDIV>
-	>();
+    // Mcu::RCC::CFGR::reg() &= 0xff02ffff;
+    Mcu::RCC::CFGR::write<Svd::FieldClear<Mcu::RCC::CFGR::PLLSRC>,
+                          Svd::FieldClear<Mcu::RCC::CFGR::PLLMUL>,
+                          Svd::FieldClear<Mcu::RCC::CFGR::PLLDIV>>();
 
-    // Disable all interrupts
-    //Mcu::RCC::CIER::write(0);
-
-	// Call C++ static initializers.
-	// ('preinit_array' functions are unlikely if the user
-	//  doesn't define any, I think. But check for them anyways.)
-	int cpp_count = 0;
-	int cpp_size = &(_epreinit_array[0]) - &(_spreinit_array[0]);
-	for (cpp_count = 0; cpp_count < cpp_size; ++cpp_count) {
-		_spreinit_array[cpp_count]();
-	}
-	// ('init_array' sections call static constructors)
-	cpp_size = &(_einit_array[0]) - &(_sinit_array[0]);
-	for (cpp_count = 0; cpp_count < cpp_size; ++cpp_count) {
-		_sinit_array[cpp_count]();
-	}
+    // Call C++ static initializers.
+    // ('preinit_array' functions are unlikely if the user
+    //  doesn't define any, I think. But check for them anyways.)
+    int cpp_count = 0;
+    int cpp_size = &(_epreinit_array[0]) - &(_spreinit_array[0]);
+    for (cpp_count = 0; cpp_count < cpp_size; ++cpp_count) {
+        _spreinit_array[cpp_count]();
+    }
+    // ('init_array' sections call static constructors)
+    cpp_size = &(_einit_array[0]) - &(_sinit_array[0]);
+    for (cpp_count = 0; cpp_count < cpp_size; ++cpp_count) {
+        _sinit_array[cpp_count]();
+    }
 }
 }
 
@@ -138,58 +130,58 @@ void system_init() {
  *         - The result of this function could be not correct when using
  *         fractional value for HSE crystal.  @param  None @retval None
  */
-//void SystemCoreClockUpdate(void) {
-    /*
-    uint32_t tmp = 0U, pllmul = 0U, plldiv = 0U, pllsource = 0U, msirange = 0U;
+// void SystemCoreClockUpdate(void) {
+/*
+uint32_t tmp = 0U, pllmul = 0U, plldiv = 0U, pllsource = 0U, msirange = 0U;
 
-    * Get SYSCLK source
-     * -------------------------------------------------------*
-    tmp = RCC->CFGR & RCC_CFGR_SWS;
+* Get SYSCLK source
+ * -------------------------------------------------------*
+tmp = RCC->CFGR & RCC_CFGR_SWS;
 
-    switch (tmp) {
-    case 0x00U: /* MSI used as system clock *
-        msirange = (RCC->ICSCR & RCC_ICSCR_MSIRANGE) >> RCC_ICSCR_MSIRANGE_Pos;
-        SystemCoreClock = (32768U * (1U << (msirange + 1U)));
-        break;
-    case 0x04U: /* HSI used as system clock *
-        if ((RCC->CR & RCC_CR_HSIDIVF) != 0U) {
-            SystemCoreClock = HSI_VALUE / 4U;
-        } else {
-            SystemCoreClock = HSI_VALUE;
-        }
-        break;
-    case 0x08U: /* HSE used as system clock *
-        SystemCoreClock = HSE_VALUE;
-        break;
-    default: /* PLL used as system clock *
-        /* Get PLL clock source and multiplication factor
-         * ----------------------*
-        pllmul = RCC->CFGR & RCC_CFGR_PLLMUL;
-        plldiv = RCC->CFGR & RCC_CFGR_PLLDIV;
-        pllmul = PLLMulTable[(pllmul >> RCC_CFGR_PLLMUL_Pos)];
-        plldiv = (plldiv >> RCC_CFGR_PLLDIV_Pos) + 1U;
-
-        pllsource = RCC->CFGR & RCC_CFGR_PLLSRC;
-
-        if (pllsource == 0x00U) {
-            /* HSI oscillator clock selected as PLL clock entry *
-            if ((RCC->CR & RCC_CR_HSIDIVF) != 0U) {
-                SystemCoreClock = (((HSI_VALUE / 4U) * pllmul) / plldiv);
-            } else {
-                SystemCoreClock = (((HSI_VALUE)*pllmul) / plldiv);
-            }
-        } else {
-            /* HSE selected as PLL clock entry *
-            SystemCoreClock = (((HSE_VALUE)*pllmul) / plldiv);
-        }
-        break;
+switch (tmp) {
+case 0x00U: /* MSI used as system clock *
+    msirange = (RCC->ICSCR & RCC_ICSCR_MSIRANGE) >> RCC_ICSCR_MSIRANGE_Pos;
+    SystemCoreClock = (32768U * (1U << (msirange + 1U)));
+    break;
+case 0x04U: /* HSI used as system clock *
+    if ((RCC->CR & RCC_CR_HSIDIVF) != 0U) {
+        SystemCoreClock = HSI_VALUE / 4U;
+    } else {
+        SystemCoreClock = HSI_VALUE;
     }
+    break;
+case 0x08U: /* HSE used as system clock *
+    SystemCoreClock = HSE_VALUE;
+    break;
+default: /* PLL used as system clock *
+    /* Get PLL clock source and multiplication factor
+     * ----------------------*
+    pllmul = RCC->CFGR & RCC_CFGR_PLLMUL;
+    plldiv = RCC->CFGR & RCC_CFGR_PLLDIV;
+    pllmul = PLLMulTable[(pllmul >> RCC_CFGR_PLLMUL_Pos)];
+    plldiv = (plldiv >> RCC_CFGR_PLLDIV_Pos) + 1U;
 
-    /* Compute HCLK clock frequency
-     * --------------------------------------------*/
-    /* Get HCLK prescaler */
-    //tmp = AHBPrescTable[((RCC->CFGR & RCC_CFGR_HPRE) >> RCC_CFGR_HPRE_Pos)];
-    /* HCLK clock frequency */
-   // SystemCoreClock >>= tmp;
+    pllsource = RCC->CFGR & RCC_CFGR_PLLSRC;
+
+    if (pllsource == 0x00U) {
+        /* HSI oscillator clock selected as PLL clock entry *
+        if ((RCC->CR & RCC_CR_HSIDIVF) != 0U) {
+            SystemCoreClock = (((HSI_VALUE / 4U) * pllmul) / plldiv);
+        } else {
+            SystemCoreClock = (((HSI_VALUE)*pllmul) / plldiv);
+        }
+    } else {
+        /* HSE selected as PLL clock entry *
+        SystemCoreClock = (((HSE_VALUE)*pllmul) / plldiv);
+    }
+    break;
+}
+
+/* Compute HCLK clock frequency
+ * --------------------------------------------*/
+/* Get HCLK prescaler */
+// tmp = AHBPrescTable[((RCC->CFGR & RCC_CFGR_HPRE) >> RCC_CFGR_HPRE_Pos)];
+/* HCLK clock frequency */
+// SystemCoreClock >>= tmp;
 
 //}
