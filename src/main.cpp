@@ -31,13 +31,13 @@ int main() {
 		}),
 		make_task<Tick<33>>([&](){
 			pin2.toggle();	
-		})
-		/*
-		,
+		}),
+		make_task<Tick<55>>([&](){
+			pin3.toggle();	
+		}),
 		make_task<Interrupt<Mcu::Interrupts::ADC_COMP, Mcu::ADC::ISR::EOS, Mcu::ADC::IER::EOSIE>>([&]() {
 			pin3.toggle();
 		})
-		*/
 	);
 
 	superloop.loop();
