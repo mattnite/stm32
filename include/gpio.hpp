@@ -1,27 +1,12 @@
 #pragma once
 
-#include "constants.hpp"
+#include "peripheral-utils.hpp"
 
 #include <bitset>
 
 #include <cstdint>
 
 namespace Gpio {
-    template <typename Mcu, typename Peripheral,
-              typename = std::enable_if_t<
-                  std::is_same_v<Mcu, typename Peripheral::Mcu>>>
-    struct ClockEnable;
-
-    template <typename Mcu, typename Peripheral,
-              typename = std::enable_if_t<
-                  std::is_same_v<Mcu, typename Peripheral::Mcu>>>
-    struct Reset;
-
-    template <typename Mcu, typename Peripheral,
-              typename = std::enable_if_t<
-                  std::is_same_v<Mcu, typename Peripheral::Mcu>>>
-    struct SleepEnable;
-
     enum class Mode { Input, Output, Alternative, Analog };
 
     template <typename Peripheral, auto pin> void setMode(Mode mode) {
@@ -110,24 +95,24 @@ namespace Gpio {
 
         template <auto pin> auto analog() { return createPin<Analog, pin>(); }
     };
-
-    template <typename Mcu> struct ClockEnable<Mcu, typename Mcu::GPIOA> {
-        using Field = typename Mcu::RCC::IOPENR::IOPAEN;
-    };
-
-    template <typename Mcu> struct ClockEnable<Mcu, typename Mcu::GPIOB> {
-        using Field = typename Mcu::RCC::IOPENR::IOPBEN;
-    };
-
-    template <typename Mcu> struct ClockEnable<Mcu, typename Mcu::GPIOC> {
-        using Field = typename Mcu::RCC::IOPENR::IOPCEN;
-    };
-
-    template <typename Mcu> struct ClockEnable<Mcu, typename Mcu::GPIOD> {
-        using Field = typename Mcu::RCC::IOPENR::IOPDEN;
-    };
-
-    template <typename Mcu> struct ClockEnable<Mcu, typename Mcu::GPIOE> {
-        using Field = typename Mcu::RCC::IOPENR::IOPEEN;
-    };
 } // namespace Gpio
+
+template <typename Mcu> struct ClockEnable<Mcu, typename Mcu::GPIOA> {
+	using Field = typename Mcu::RCC::IOPENR::IOPAEN;
+};
+
+template <typename Mcu> struct ClockEnable<Mcu, typename Mcu::GPIOB> {
+	using Field = typename Mcu::RCC::IOPENR::IOPBEN;
+};
+
+template <typename Mcu> struct ClockEnable<Mcu, typename Mcu::GPIOC> {
+	using Field = typename Mcu::RCC::IOPENR::IOPCEN;
+};
+
+template <typename Mcu> struct ClockEnable<Mcu, typename Mcu::GPIOD> {
+	using Field = typename Mcu::RCC::IOPENR::IOPDEN;
+};
+
+template <typename Mcu> struct ClockEnable<Mcu, typename Mcu::GPIOE> {
+	using Field = typename Mcu::RCC::IOPENR::IOPEEN;
+};

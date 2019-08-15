@@ -190,11 +190,9 @@ public:
 		: tasks(ts...) 
 		  // vector table initialization needs to have 
 		, vectorTable(
-			std::make_pair(Mcu::Interrupts::RCC, make_system_tick_handler(make_index_pairs(tasks)))
+			std::make_pair(Mcu::Interrupts::RCC, make_system_tick_handler(make_index_pairs(tasks))),
 		)
-	{
-		auto test = make_index_pairs(tasks);	
-	}
+	{}
 
 	template <auto n>
 	void check_flag() {
