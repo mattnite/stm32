@@ -1,5 +1,6 @@
 //#include "stm32l0xx.h"
 #include "constants.hpp"
+#include "clock.hpp"
 
 #include <algorithm>
 #include <cstdint>
@@ -41,8 +42,6 @@ extern void (*_spreinit_array[])(void) __attribute__((weak));
 extern void (*_epreinit_array[])(void) __attribute__((weak));
 extern void (*_sinit_array[])(void) __attribute__((weak));
 extern void (*_einit_array[])(void) __attribute__((weak));
-
-using Mcu = STM32L0x3;
 
 extern "C" {
 inline void static_initializers() {
@@ -90,6 +89,8 @@ void system_init() {
     Mcu::RCC::CFGR::write<Svd::ClearField<Mcu::RCC::CFGR::PLLSRC>,
                           Svd::ClearField<Mcu::RCC::CFGR::PLLMUL>,
                           Svd::ClearField<Mcu::RCC::CFGR::PLLDIV>>();
+
+    SysClk::init();
 
     static_initializers();
 }

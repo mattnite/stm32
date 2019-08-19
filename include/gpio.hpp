@@ -24,9 +24,12 @@ namespace Gpio {
 
     enum class Mode { Input, Output, Alternative, Analog };
 
-    template <typename Peripheral, auto pin> void setMode(Mode mode) {
-        Peripheral::MODER::reg() &=
-            (~(3 << 2 * pin) | static_cast<std::uint32_t>(mode));
+    template <typename Peripheral, auto pin> constexpr void setMode(Mode mode) {
+        auto ptr = &Peripheral::MODER::reg();
+        auto offset = 2 * pin;
+        auto mask = 3 << offset;
+        *ptr = (*ptr & ~mask) |
+              (mask & (static_cast<std::uint32_t>(mode) << offset));
     }
 
     template <typename Peripheral, auto pin> struct Pulse {
@@ -81,9 +84,13 @@ namespace Gpio {
     };
 
     template <typename PinType> struct Pin : PinType {
-        Pin() { PinType::Peripheral::LCKR::set(PinType::pin); }
+        Pin() {
+            // PinType::Peripheral::LCKR::set(PinType::pin);
+        }
 
-        ~Pin() { PinType::Peripheral::LCKR::clear(PinType::pin); }
+        ~Pin() {
+            // PinType::Peripheral::LCKR::clear(PinType::pin);
+        }
     };
 
     template <typename Peripheral> struct Port {
