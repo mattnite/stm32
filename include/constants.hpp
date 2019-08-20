@@ -5,5 +5,5 @@
 #include "svd-alias/st-micro/STM32L0x3.hpp"
 
 using Mcu = STM32L0x3;
-using SysClk =
-    Clock<Mcu>::Control<Clock<Mcu>::Pll<Clock<Mcu>::Hsi16<true>, 4, 2>>;
+using Clk = Clock<Mcu>;
+using SysClk = Clk::SysClk<Clk::Pll<Clk::Hsi16<true>, 4, 2>>;

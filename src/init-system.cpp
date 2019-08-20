@@ -61,37 +61,7 @@ inline void static_initializers() {
 }
 
 void system_init() {
-    Mcu::RCC::CR::MSION::write(1);
-
-    // Reset SW[1:0], HPRE[3:0], PPRE1[2:0], PPRE2[2:0], MCOSEL[2:0],
-    // MCOPRE[2:0] bits
-    // Mcu::RCC::CFGR::reg() &= 0x88ff400c;
-    Mcu::RCC::CFGR::write<Svd::ClearField<Mcu::RCC::CFGR::SW>,
-                          Svd::ClearField<Mcu::RCC::CFGR::HPRE>,
-                          Svd::ClearField<Mcu::RCC::CFGR::PPRE1>,
-                          Svd::ClearField<Mcu::RCC::CFGR::PPRE2>,
-                          Svd::ClearField<Mcu::RCC::CFGR::MCOSEL>,
-                          Svd::ClearField<Mcu::RCC::CFGR::MCOPRE>>();
-
-    // Reset HSION, HSIDIVEN, HSEON, CSSON and PLLON bits
-    // Mcu::RCC::CR::reg() &= 0xfef6fff6;
-    Mcu::RCC::CR::write<Svd::ClearField<Mcu::RCC::CR::HSI16ON>,
-                        Svd::ClearField<Mcu::RCC::CR::HSI16DIVEN>,
-                        Svd::ClearField<Mcu::RCC::CR::HSEON>,
-                        Svd::ClearField<Mcu::RCC::CR::CSSLSEON>,
-                        Svd::ClearField<Mcu::RCC::CR::PLLON>>();
-
-    Mcu::RCC::CRRCR::HSI48ON::write(0);
-    Mcu::RCC::CR::HSEBYP::write(0);
-
-    // Reset PLLSRC, PLLMUL[3:0] and PLLDIV[1:0] bits
-    // Mcu::RCC::CFGR::reg() &= 0xff02ffff;
-    Mcu::RCC::CFGR::write<Svd::ClearField<Mcu::RCC::CFGR::PLLSRC>,
-                          Svd::ClearField<Mcu::RCC::CFGR::PLLMUL>,
-                          Svd::ClearField<Mcu::RCC::CFGR::PLLDIV>>();
-
     SysClk::init();
-
     static_initializers();
 }
 }
