@@ -13,7 +13,7 @@
  */
 template <typename Peripheral, auto baud>
 struct Usart {
-    using Clock = typename ClockSource<Peripheral::Mcu, Peripheral>::Type;
+    using Clock = typename ClockSource<Peripheral>::Type;
 
     Usart() {
         Peripheral::BRR::write(

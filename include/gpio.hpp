@@ -80,11 +80,11 @@ namespace Gpio {
 
     template <typename Peripheral> struct Port {
         constexpr Port() {
-            ClockEnable<typename Peripheral::Mcu, Peripheral>::Field::write(1);
+            ClockEnable<Peripheral>::Field::write(1);
         }
 
         ~Port() {
-            ClockEnable<typename Peripheral::Mcu, Peripheral>::Field::write(0);
+            ClockEnable<Peripheral>::Field::write(0);
         }
 
         template <template <typename, auto> typename PinType, auto pin>
@@ -104,22 +104,22 @@ namespace Gpio {
     };
 } // namespace Gpio
 
-template <typename Mcu> struct ClockEnable<Mcu, typename Mcu::GPIOA> {
+template <typename Mcu> struct ClockEnableImpl<Mcu, typename Mcu::GPIOA> {
 	using Field = typename Mcu::RCC::IOPENR::IOPAEN;
 };
 
-template <typename Mcu> struct ClockEnable<Mcu, typename Mcu::GPIOB> {
+template <typename Mcu> struct ClockEnableImpl<Mcu, typename Mcu::GPIOB> {
 	using Field = typename Mcu::RCC::IOPENR::IOPBEN;
 };
 
-template <typename Mcu> struct ClockEnable<Mcu, typename Mcu::GPIOC> {
+template <typename Mcu> struct ClockEnableImpl<Mcu, typename Mcu::GPIOC> {
 	using Field = typename Mcu::RCC::IOPENR::IOPCEN;
 };
 
-template <typename Mcu> struct ClockEnable<Mcu, typename Mcu::GPIOD> {
+template <typename Mcu> struct ClockEnableImpl<Mcu, typename Mcu::GPIOD> {
 	using Field = typename Mcu::RCC::IOPENR::IOPDEN;
 };
 
-template <typename Mcu> struct ClockEnable<Mcu, typename Mcu::GPIOE> {
+template <typename Mcu> struct ClockEnableImpl<Mcu, typename Mcu::GPIOE> {
 	using Field = typename Mcu::RCC::IOPENR::IOPEEN;
 };

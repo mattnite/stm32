@@ -9,17 +9,29 @@
 template <typename...>
 using Reset = void;
 
-template <typename Mcu, typename Peripheral,
-			typename = std::enable_if_t<
-				std::is_same_v<Mcu, typename Peripheral::Mcu>>>
-struct ClockEnable;
+template <typename Peripheral, typename Impl>
+using Glue = Impl<typename Peripheral::Mcu, Peripheral>;
 
 template <typename Mcu, typename Peripheral,
 			typename = std::enable_if_t<
 				std::is_same_v<Mcu, typename Peripheral::Mcu>>>
-struct SleepEnable;
+struct ClockEnableImpl;
 
 template <typename Mcu, typename Peripheral,
 			typename = std::enable_if_t<
 				std::is_same_v<Mcu, typename Peripheral::Mcu>>>
-struct ClockSource;
+struct SleepEnableImpl;
+
+template <typename Mcu, typename Peripheral,
+			typename = std::enable_if_t<
+				std::is_same_v<Mcu, typename Peripheral::Mcu>>>
+struct ClockSourceImpl;
+
+template <typename Peripheral>
+using ClockEnable = Glue<Peripheral, ClockEnableImpl>;
+
+template <typename Peripheral>
+using SleepEnable = Glue<Peripheral, SleepEnableImpl>;
+
+template <typename Peripheral>
+using ClockSource = Glue<Peripheral, ClockSourceImpl>;

@@ -8,7 +8,7 @@ using Base = STM32L0x3;
 
 struct Mcu : public Base {
     using Clk = Clock<Base>;
-    using SysClk = Clk::SysClk<Clk::Pll<Clk::Hsi16<true>, 4, 2>>;
+    using SysClk = Clk::SysClk<Clk::Hsi16<>>;
     using Ahb = Clk::Ahb<SysClk, 1>;
     using Apb1 = Clk::Apb1<Ahb, 1>;
     using Apb2 = Clk::Apb2<Ahb, 1>;
@@ -19,4 +19,4 @@ struct Mcu : public Base {
     }
 
     static void clock_init() { clocks_init<SysClk, Ahb, Apb1, Apb2>(); }
-}
+};

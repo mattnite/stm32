@@ -10,6 +10,10 @@
 
 #include "svd-alias/register.hpp"
 
+namespace {
+    constexpr std::uint32_t baud_divs = {2, 4, 6, 8, 16, 32, 64, 128, 256};
+}
+
 namespace Spi {
     enum class Type { Master, Slave };
 
@@ -29,7 +33,7 @@ namespace Spi {
             Peripheral::CR1::write<
                 Svd::FieldPair<Peripheral::CR1::BR, 0>,
                 Svd::FieldPair<Peripheral::CR1::CPHA, mode & 0x1>,
-                Svd::FieldPair<Peripheral::CR1::CPOL, (mode & 0x2)>> 1 >,
+                Svd::FieldPair<Peripheral::CR1::CPOL, mode>> 1 >,
                 Svd::FieldPair<Peripheral::CR1::LSBFIRST, lsb_first>,
                 Svd::FieldPair<Peripheral::CR1::MSTR, type == Type::Master>,
                 Svd::FieldPair<Peripheral::CR1::DFF, sizeof(DataFrame) == 1>>
@@ -39,13 +43,13 @@ namespace Spi {
                 Peripheral::CR2::SSOE::write(1);
             }
             // - write to dedicated DMA streams if they are required
-            ClockEnable<Peripheral::Mcu, Peripheral>::Field::write(1);
+            ClockEnable<Peripheral>::Field::write(1);
             Peripheral::CR1::SPIEN::write(1);
         }
 
         ~Module() {
             // TODO: more to this
-            ClockEnable<Peripheral::Mcu, Peripheral>::Field::write(0);
+            ClockEnable<Peripheral>::Field::write(0);
         }
     }
 }; // namespace Spi
@@ -78,6 +82,16 @@ struct SleepEnable<Mcu, typename Mcu::SPI1> {
 template <typename Mcu>
 struct SleepEnable<Mcu, typename Mcu::SPI2> {
     using Field = typename Mcu::RCC::APB2SMENR::SPI2SMEN;
+};
+
+template <typename Mcu>
+struct ClockSource<Mcu, typename Mcu::SPI1> {
+    using Type = typename Mcu::Apb2;
+};
+
+template <typename Mcu>
+struct ClockSource<Mcu, typename Mcu::SPI2> {
+    using Type = typename Mcu::Apb1;
 };
 
 struct SPI1 {
