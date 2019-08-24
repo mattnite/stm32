@@ -18,3 +18,8 @@ template <typename Mcu, typename Peripheral,
 			typename = std::enable_if_t<
 				std::is_same_v<Mcu, typename Peripheral::Mcu>>>
 struct SleepEnable;
+
+template <typename Mcu, typename Peripheral,
+			typename = std::enable_if_t<
+				std::is_same_v<Mcu, typename Peripheral::Mcu>>>
+struct ClockSource;

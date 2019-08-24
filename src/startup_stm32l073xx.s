@@ -12,7 +12,7 @@
   *            After Reset the Cortex-M0+ processor is in Thread mode,
   *            priority is Privileged, and the Stack is set to Main.
   ******************************************************************************
-  * 
+  *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted provided that the following conditions are met:
   *   1. Redistributions of source code must retain the above copyright notice,
@@ -48,7 +48,7 @@
 .section  .text.reset_handler
   .weak  reset_handler
   .type  reset_handler, %function
-reset_handler:  
+reset_handler:
     ldr     r0, =_estack
     mov     sp, r0          /* set stack pointer */
     bl      system_init
@@ -79,7 +79,7 @@ loop_fill_zero_bss:
     ldr     r3, = _ebss
     cmp     r2, r3
     bcc     fill_zero_bss
-  
+
     bl      main
 
 loop_forever:

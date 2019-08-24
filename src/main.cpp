@@ -7,7 +7,7 @@
 // This file holds the main application
 
 #include "basic-timer.hpp"
-#include "constants.hpp"
+#include "config.hpp"
 #include "gpio.hpp"
 #include "super-loop.hpp"
 

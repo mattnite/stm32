@@ -13,9 +13,10 @@
 #include <ratio>
 
 namespace {
-    constexpr std::uint32_t pll_multipliers[] = {3,  4,  6,  8, 12,
-                                                 16, 24, 32, 48};
-    constexpr std::uint32_t pll_dividers[] = {2, 3, 4};
+    constexpr std::uint32_t pll_muls[] = {3, 4, 6, 8, 12, 16, 24, 32, 48};
+    constexpr std::uint32_t pll_divs[] = {2, 3, 4};
+    constexpr std::uint32_t ahb_divs[] = {1};
+    constexpr std::uint32_t apb_divs[] = {1};
 
     template <typename Iterator, typename Predicate>
     constexpr bool any_of(Iterator first, Iterator last, Predicate pred) {
@@ -33,6 +34,12 @@ namespace {
                 return first;
 
         return first;
+    }
+
+    template <typename Array>
+    constexpr auto array_index(Array const& arr, std::uint32_t val) {
+        return std::distance(std::begin(arr),
+                             find(std::begin(arr), std::end(arr), val));
     }
 
     template <typename Field, auto val>
@@ -64,13 +71,12 @@ struct Clock {
 
     template <typename Source, auto mul, auto div>
     struct Pll {
-        static_assert(any_of(std::begin(pll_multipliers),
-                             std::end(pll_multipliers),
+        static_assert(any_of(std::begin(pll_muls), std::end(pll_muls),
                              [](auto& val) { return val == mul; }),
                       "Invalid PLL multiplier value");
-        static_assert(any_of(std::begin(pll_dividers), std::end(pll_dividers),
+        static_assert(any_of(std::begin(pll_divs), std::end(pll_divs),
                              [](auto& val) { return val == div; }),
-                      "Invalid PLL multiplier value");
+                      "Invalid PLL divider value");
 
         using Frequency = std::ratio_multiply<typename Source::Frequency,
                                               std::ratio<mul, div>>;
@@ -91,13 +97,8 @@ struct Clock {
                         FieldEquals<typename Mcu::RCC::CR::PLLRDY, 0>>();
 
             Mcu::Flash::ACR::LATENCY::write(1);
-            Mcu::RCC::CFGR::PLLMUL::write(
-                std::distance(std::begin(pll_multipliers),
-                              find(std::begin(pll_multipliers),
-                                   std::end(pll_multipliers), mul)));
-            Mcu::RCC::CFGR::PLLDIV::write(std::distance(
-                std::begin(pll_dividers),
-                find(std::begin(pll_dividers), std::end(pll_dividers), div)));
+            Mcu::RCC::CFGR::PLLMUL::write(array_index(pll_muls, mul));
+            Mcu::RCC::CFGR::PLLDIV::write(array_index(pll_divs, div));
             Mcu::RCC::CFGR::PLLSRC::write(
                 static_cast<std::uint32_t>(Source::pll_value));
 
@@ -140,5 +141,35 @@ struct Clock {
                             static_cast<std::uint32_t>(
                                 Source::sysclk_value)>>();
         }
+    };
+
+    // Source should be SysClk
+    template <typename Source, auto div>
+    struct Ahb {
+        static_assert(any_of(std::begin(ahb_divs), std::end(ahb_divs),
+                             [](auto& elem) { return elem == div; }),
+                      "Invalid AHB prescaler value");
+
+        using Frequency =
+            std::ratio_multiply<typename Source::Frequency, std::ratio<1, div>>;
+        static void init() {
+            // set register -- optimize for 1
+        }
+    };
+
+    // Source should be Ahb
+    template <typename Source, auto div>
+    struct Apb1 {
+        using Frequency =
+            std::ratio_multiply<typename Source::Frequency, std::ratio<1, div>>;
+        static void init() {}
+    };
+
+    // Source should be Ahb
+    template <typename Source, auto div>
+    struct Apb2 {
+        using Frequency =
+            std::ratio_multiply<typename Source::Frequency, std::ratio<1, div>>;
+        static void init() {}
     };
 };

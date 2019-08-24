@@ -24,7 +24,7 @@ add_executable(stm32
     src/startup_stm32l073xx.s
     src/init-system.cpp
     src/main.cpp)
-   
+
 target_include_directories(stm32 PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_link_libraries(stm32 svd-alias::svd-alias gcc)
 
