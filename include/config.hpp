@@ -2,7 +2,7 @@
 
 #include "clock.hpp"
 
-#include "svd-alias/st-micro/STM32L0x3.hpp"
+#include "register-alias/st-micro/STM32L0x3.hpp"
 
 using Base = STM32L0x3;
 

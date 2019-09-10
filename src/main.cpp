@@ -11,8 +11,8 @@
 #include "gpio.hpp"
 #include "super-loop.hpp"
 
-#include "svd-alias/sys-tick.hpp"
-#include "svd-alias/vector-table.hpp"
+#include "register-alias/sys-tick.hpp"
+#include "register-alias/vector-table.hpp"
 
 #include <array>
 #include <tuple>

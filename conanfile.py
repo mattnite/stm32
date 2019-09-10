@@ -10,7 +10,7 @@ class Stm32Conan(ConanFile):
     topics = ("embedded", "mcu", "stm32")
     generators = "cmake_find_package", "virtualenv"
     build_requires = "gcc-arm-none-eabi_installer/8-2018-q4-major@matt1795/testing"
-    requires = "svd-alias/0.2@matt1795/testing"
+    requires = "register-alias/0.3@matt1795/testing"
     options = {
         "thumb": [True, False],
     }

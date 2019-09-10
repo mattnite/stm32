@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "svd-alias/util.hpp"
+#include "register-alias/util.hpp"
 
 #include <algorithm>
 #include <iterator>

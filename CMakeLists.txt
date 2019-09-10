@@ -5,7 +5,7 @@ if(NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE MinSizeRel)
 endif()
 
-find_package(svd-alias REQUIRED)
+find_package(register-alias REQUIRED)
 
 include($ENV{SVD_MODULE_PATH}/st-micro/STM32L0x3.cmake)
 
@@ -26,7 +26,7 @@ add_executable(stm32
     src/main.cpp)
 
 target_include_directories(stm32 PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")
-target_link_libraries(stm32 svd-alias::svd-alias gcc)
+target_link_libraries(stm32 register-alias::register-alias gcc)
 
 add_custom_command(
 	TARGET stm32 POST_BUILD

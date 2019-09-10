@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "svd-alias/vector-table.hpp"
+#include "register-alias/vector-table.hpp"
 
 #include <bitset>
 #include <tuple>
@@ -183,7 +183,7 @@ class SuperLoop {
     }
 
     std::tuple<Tasks...> tasks;
-    Svd::VectorTable<Mcu> vectorTable;
+    RegisterAlias::VectorTable<Mcu> vectorTable;
 
   public:
     SuperLoop(Tasks&&... ts)

@@ -9,24 +9,27 @@
 template <typename...>
 using Reset = void;
 
-template <typename Peripheral, typename Impl>
+template <typename Peripheral, template <typename, typename> typename Impl>
 using Glue = Impl<typename Peripheral::Mcu, Peripheral>;
 
+template <typename Mcu, typename Peripheral>
+using McuMatch =
+    std::enable_if_t<std::is_same_v<Mcu, typename Peripheral::Mcu>>;
+
+// Peripheral attribute declarations
 template <typename Mcu, typename Peripheral,
-			typename = std::enable_if_t<
-				std::is_same_v<Mcu, typename Peripheral::Mcu>>>
+          typename = McuMatch<Mcu, Peripheral>>
 struct ClockEnableImpl;
 
 template <typename Mcu, typename Peripheral,
-			typename = std::enable_if_t<
-				std::is_same_v<Mcu, typename Peripheral::Mcu>>>
+          typename = McuMatch<Mcu, Peripheral>>
 struct SleepEnableImpl;
 
 template <typename Mcu, typename Peripheral,
-			typename = std::enable_if_t<
-				std::is_same_v<Mcu, typename Peripheral::Mcu>>>
+          typename = McuMatch<Mcu, Peripheral>>
 struct ClockSourceImpl;
 
+// Peripheral attribute
 template <typename Peripheral>
 using ClockEnable = Glue<Peripheral, ClockEnableImpl>;
 

@@ -6,6 +6,4 @@
 
 #pragma once
 
-struct Dac {
-
-};
+struct Dac {};

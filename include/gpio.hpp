@@ -9,15 +9,17 @@
 namespace Gpio {
     enum class Mode { Input, Output, Alternative, Analog };
 
-    template <typename Peripheral, auto pin> constexpr void setMode(Mode mode) {
+    template <typename Peripheral, auto pin>
+    constexpr void setMode(Mode mode) {
         auto ptr = &Peripheral::MODER::reg();
         auto offset = 2 * pin;
         auto mask = 3 << offset;
         *ptr = (*ptr & ~mask) |
-              (mask & (static_cast<std::uint32_t>(mode) << offset));
+               (mask & (static_cast<std::uint32_t>(mode) << offset));
     }
 
-    template <typename Peripheral, auto pin> struct Pulse {
+    template <typename Peripheral, auto pin>
+    struct Pulse {
         Pulse() {
             Peripheral::BSRR::clear(pin);
             Peripheral::BSRR::set(pin);
@@ -26,7 +28,8 @@ namespace Gpio {
         ~Pulse() { Peripheral::BSRR::clear(pin); }
     };
 
-    template <typename Peripheral, auto pin> struct PinBase {
+    template <typename Peripheral, auto pin>
+    struct PinBase {
         ~PinBase() { setMode<Peripheral, pin>(Mode::Input); }
     };
 
@@ -68,7 +71,8 @@ namespace Gpio {
         Analog() { setMode<Peripheral, pin>(Mode::Analog); }
     };
 
-    template <typename PinType> struct Pin : PinType {
+    template <typename PinType>
+    struct Pin : PinType {
         Pin() {
             // PinType::Peripheral::LCKR::set(PinType::pin);
         }
@@ -78,48 +82,60 @@ namespace Gpio {
         }
     };
 
-    template <typename Peripheral> struct Port {
-        constexpr Port() {
-            ClockEnable<Peripheral>::Field::write(1);
-        }
+    template <typename Peripheral>
+    struct Port {
+        constexpr Port() { ClockEnable<Peripheral>::Field::write(1); }
 
-        ~Port() {
-            ClockEnable<Peripheral>::Field::write(0);
-        }
+        ~Port() { ClockEnable<Peripheral>::Field::write(0); }
 
         template <template <typename, auto> typename PinType, auto pin>
         Pin<PinType<Peripheral, pin>> createPin() {
             return {};
         }
 
-        template <auto pin> auto output() { return createPin<Output, pin>(); }
+        template <auto pin>
+        auto output() {
+            return createPin<Output, pin>();
+        }
 
-        template <auto pin> auto input() { return createPin<Input, pin>(); }
+        template <auto pin>
+        auto input() {
+            return createPin<Input, pin>();
+        }
 
-        template <auto pin> auto alternate() {
+        template <auto pin>
+        auto alternate() {
             return createPin<Alternate, pin>();
         }
 
-        template <auto pin> auto analog() { return createPin<Analog, pin>(); }
+        template <auto pin>
+        auto analog() {
+            return createPin<Analog, pin>();
+        }
     };
 } // namespace Gpio
 
-template <typename Mcu> struct ClockEnableImpl<Mcu, typename Mcu::GPIOA> {
-	using Field = typename Mcu::RCC::IOPENR::IOPAEN;
+template <typename Mcu>
+struct ClockEnableImpl<Mcu, typename Mcu::GPIOA> {
+    using Field = typename Mcu::RCC::IOPENR::IOPAEN;
 };
 
-template <typename Mcu> struct ClockEnableImpl<Mcu, typename Mcu::GPIOB> {
-	using Field = typename Mcu::RCC::IOPENR::IOPBEN;
+template <typename Mcu>
+struct ClockEnableImpl<Mcu, typename Mcu::GPIOB> {
+    using Field = typename Mcu::RCC::IOPENR::IOPBEN;
 };
 
-template <typename Mcu> struct ClockEnableImpl<Mcu, typename Mcu::GPIOC> {
-	using Field = typename Mcu::RCC::IOPENR::IOPCEN;
+template <typename Mcu>
+struct ClockEnableImpl<Mcu, typename Mcu::GPIOC> {
+    using Field = typename Mcu::RCC::IOPENR::IOPCEN;
 };
 
-template <typename Mcu> struct ClockEnableImpl<Mcu, typename Mcu::GPIOD> {
-	using Field = typename Mcu::RCC::IOPENR::IOPDEN;
+template <typename Mcu>
+struct ClockEnableImpl<Mcu, typename Mcu::GPIOD> {
+    using Field = typename Mcu::RCC::IOPENR::IOPDEN;
 };
 
-template <typename Mcu> struct ClockEnableImpl<Mcu, typename Mcu::GPIOE> {
-	using Field = typename Mcu::RCC::IOPENR::IOPEEN;
+template <typename Mcu>
+struct ClockEnableImpl<Mcu, typename Mcu::GPIOE> {
+    using Field = typename Mcu::RCC::IOPENR::IOPEEN;
 };

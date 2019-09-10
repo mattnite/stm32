@@ -8,10 +8,12 @@
 
 #include "gpio.hpp"
 
-#include "svd-alias/register.hpp"
+#include "register-alias/register.hpp"
+
+using namespace RegisterAlias;
 
 namespace {
-    constexpr std::uint32_t baud_divs = {2, 4, 6, 8, 16, 32, 64, 128, 256};
+    constexpr std::uint32_t baud_divs[] = {2, 4, 6, 8, 16, 32, 64, 128, 256};
 }
 
 namespace Spi {
@@ -29,15 +31,16 @@ namespace Spi {
     struct Module {
         Module() {
             static_assert(mode >= 0 && mode < 4, "SPI mode is 0-3");
+            static_assert(sizeof(DataFrame) == 1 || sizeof(DataFrame) == 2);
 
             Peripheral::CR1::write<
-                Svd::FieldPair<Peripheral::CR1::BR, 0>,
-                Svd::FieldPair<Peripheral::CR1::CPHA, mode & 0x1>,
-                Svd::FieldPair<Peripheral::CR1::CPOL, mode>> 1 >,
-                Svd::FieldPair<Peripheral::CR1::LSBFIRST, lsb_first>,
-                Svd::FieldPair<Peripheral::CR1::MSTR, type == Type::Master>,
-                Svd::FieldPair<Peripheral::CR1::DFF, sizeof(DataFrame) == 1>>
-                    ();
+                FieldPair<typename Peripheral::CR1::BR, 0>,
+                FieldPair<typename Peripheral::CR1::CPHA, mode & 0x1>,
+                FieldPair<typename Peripheral::CR1::CPOL, mode>> 1 >,
+                FieldPair<typename Peripheral::CR1::LSBFIRST, lsb_first>,
+                FieldPair<typename Peripheral::CR1::MSTR, type == Type::Master>,
+                FieldPair<typename Peripheral::CR1::DFF,
+                          sizeof(DataFrame) == 1>> ();
 
             if constexpr (type == Type::Master) {
                 Peripheral::CR2::SSOE::write(1);
@@ -51,7 +54,7 @@ namespace Spi {
             // TODO: more to this
             ClockEnable<Peripheral>::Field::write(0);
         }
-    }
+    };
 }; // namespace Spi
 
 template <typename Mcu>
@@ -93,7 +96,7 @@ template <typename Mcu>
 struct ClockSource<Mcu, typename Mcu::SPI2> {
     using Type = typename Mcu::Apb1;
 };
-
+/*
 struct SPI1 {
     using Mcu = STM32L0x3;
 
@@ -179,3 +182,4 @@ struct SPI1 {
         using I2SDIV = Field<0, 8>; // I2S Linear prescaler
     };
 };
+*/
